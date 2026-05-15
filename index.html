@@ -223,7 +223,25 @@ button:hover{
 
 }
 
+/* ================= QUESTION IMAGE ================= */
+
+#questionImageContainer{
+    margin-bottom:20px;
+    text-align:center;
+}
+
+#questionImageContainer img{
+    max-width:100%;
+    max-height:350px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+
 </style>
+
+<meta name="theme-color" content="#007bff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
 </head>
 
 <body>
@@ -296,6 +314,7 @@ button:hover{
         <div id="progress"></div>
 
         <h2 id="question"></h2>
+        <div id="questionImageContainer"></div>
 
         <div id="answers"></div>
 
@@ -405,6 +424,20 @@ function loadQuestion(){
         .innerText =
         q.question;
 
+        /* ===== QUESTION IMAGE ===== */
+    
+    let imageContainer =
+        document.getElementById("questionImageContainer");
+    
+    if(q.image){
+    
+        imageContainer.innerHTML =
+            `<img src="${q.image}" alt="Εικόνα ερώτησης">`;
+    
+    }else{
+
+        imageContainer.innerHTML = "";
+    }
     let answersDiv =
         document.getElementById("answers");
 
