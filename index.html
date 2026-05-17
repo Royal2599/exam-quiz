@@ -406,7 +406,7 @@ function startQuiz(){
         .classList.remove("hidden");
 
     updateSidebar();
-    
+
     loadQuestion();
 }
 
@@ -655,6 +655,8 @@ function toggleSidebar(){
         sidebar.style.display = "none";
 
     }else{
+
+        updateSidebar();
 
         sidebar.style.display = "block";
     }
