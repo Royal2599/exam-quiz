@@ -903,20 +903,38 @@ function updateSidebar(){
 
         div.className = "sidebar-item";
 
-        let correct =
-            Array.isArray(q.correct)
-            ? q.correct
-            : [q.correct];
-
         let user =
             userAnswers[index];
+        
+        let ok = false;
+        
+        if(q.type === "image_fill"){
+        
+            ok =
+               JSON.stringify(user || [])
+               ===
+               JSON.stringify(
+                   q.correctAnswers
+            );
+
+        }else{
+
+            let correct =
+                Array.isArray(q.correct)
+                ? q.correct
+                : [q.correct];
+        
+            ok =
+                JSON.stringify(
+                    [...(user || [])].sort()
+                )
+                ===
+                JSON.stringify(
+                   [...correct].sort()
+                );
+        }
 
         if(user !== undefined){
-
-            let ok =
-                JSON.stringify([...user].sort())
-                ===
-                JSON.stringify([...correct].sort());
 
             if(ok){
 
