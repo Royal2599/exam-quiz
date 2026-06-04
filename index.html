@@ -669,9 +669,6 @@ function checkImageFillAnswer(){
     let correct =
         q.correctAnswers;
 
-    console.log("Selected:", selected);
-    console.log("Correct:", correct);
-    
     let isCorrect =
         JSON.stringify(selected)
         ===
@@ -758,16 +755,19 @@ function showResults(){
         
         if(q.type === "image_fill"){
 
-            let user =
-                userAnswers[i] || [];
-    
-            if(
-                JSON.stringify(user)
-                ===
-                JSON.stringify(q.correctAnswers)
-            ){
-                score++;
-            }
+            console.log("SIDEBAR USER:", user);
+            console.log("SIDEBAR CORRECT:", q.correctAnswers);
+            console.log(
+                "SIDEBAR EQUAL:",
+                JSON.stringify(user || []) === JSON.stringify(q.correctAnswers)
+            );
+        
+            ok =
+               JSON.stringify(user || [])
+               ===
+               JSON.stringify(q.correctAnswers);
+        
+        }else{
         
             return;
         }
@@ -906,38 +906,20 @@ function updateSidebar(){
 
         div.className = "sidebar-item";
 
+        let correct =
+            Array.isArray(q.correct)
+            ? q.correct
+            : [q.correct];
+
         let user =
             userAnswers[index];
-        
-        let ok = false;
-        
-        if(q.type === "image_fill"){
-        
-            ok =
-               JSON.stringify(user || [])
-               ===
-               JSON.stringify(
-                   q.correctAnswers
-            );
-
-        }else{
-
-            let correct =
-                Array.isArray(q.correct)
-                ? q.correct
-                : [q.correct];
-        
-            ok =
-                JSON.stringify(
-                    [...(user || [])].sort()
-                )
-                ===
-                JSON.stringify(
-                   [...correct].sort()
-                );
-        }
 
         if(user !== undefined){
+
+            let ok =
+                JSON.stringify([...user].sort())
+                ===
+                JSON.stringify([...correct].sort());
 
             if(ok){
 

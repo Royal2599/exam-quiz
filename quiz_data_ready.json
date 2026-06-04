@@ -7926,7 +7926,7 @@
     "mode": "theory",
     "question": "Nα συμπληρωθούν τα κενά με : R507, R404A, R407A",
     "image": "images/Picture16.png",
-    "type": "image_fill",
+    "type":"image_fill",
     "labels": [
       "α",
       "β",
