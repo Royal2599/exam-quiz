@@ -237,6 +237,14 @@ button:hover{
     box-shadow:0 2px 8px rgba(0,0,0,0.15);
 }
 
+select{
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    min-width:180px;
+    font-size:16px;
+}
+
 </style>
 
 <meta name="theme-color" content="#007bff">
@@ -280,11 +288,11 @@ button:hover{
         <h2>Καλώς ήρθες</h2>
 
         <p>
-            Πάτησε Ξεκινήστε! για να ξεκινήσεις το Quiz.
+            Πάτησε Πάμε! για να ξεκινήσεις το Quiz.
         </p>
 
         <button onclick="startQuiz()">
-            Ξεκινήστε!
+            Πάμε!
         </button>
 
     </div>
@@ -330,8 +338,7 @@ button:hover{
             </button>
 
             <button id="nextBtn"
-                    onclick="nextQuestion()"
-                    disabled>
+                    onclick="nextQuestion()">
 
                 Επόμενο
 
@@ -445,6 +452,21 @@ function loadQuestion(){
 
     answersDiv.innerHTML = "";
 
+    if(q.type === "image_fill"){
+    
+        loadImageFillQuestion(q);
+    
+        document
+            .getElementById("feedback")
+            .innerHTML = "";
+    
+        updateHintPanel();
+    
+        updateSidebar();
+    
+        return;
+    }
+    
     let multiple =
         Array.isArray(q.correct);
 
@@ -492,16 +514,77 @@ function loadQuestion(){
         .getElementById("feedback")
         .innerHTML = "";
 
-    document
-        .getElementById("nextBtn")
-        .disabled = true;
-
     updateHintPanel();
 
     updateSidebar();
 }
 
 /* ================= CHECK ANSWER ================= */
+function loadImageFillQuestion(q){
+
+    let answersDiv =
+        document.getElementById("answers");
+
+    answersDiv.innerHTML = "";
+
+    q.labels.forEach((label,index)=>{
+
+        let div =
+            document.createElement("div");
+
+        div.className = "answer";
+
+        let title =
+            document.createElement("label");
+
+        title.innerText = label + ":";
+
+        let select =
+            document.createElement("select");
+
+        select.id = "fill_" + index;
+
+        let first =
+            document.createElement("option");
+
+        first.value = "";
+
+        first.innerText =
+            "Επιλογή";
+
+        select.appendChild(first);
+
+        q.options.forEach(option=>{
+
+            let opt =
+                document.createElement("option");
+
+            opt.value = option;
+
+            opt.innerText = option;
+
+            select.appendChild(opt);
+        });
+
+        div.appendChild(title);
+
+        div.appendChild(select);
+
+        answersDiv.appendChild(div);
+    });
+
+    let submitBtn =
+        document.createElement("button");
+
+    submitBtn.id = "submitBtn";
+
+    submitBtn.innerText = "Υποβολή";
+
+    submitBtn.onclick =
+        checkImageFillAnswer;
+
+    answersDiv.appendChild(submitBtn);
+}
 
 function checkAnswer(){
 
@@ -561,9 +644,67 @@ function checkAnswer(){
              ${correctAnswers}`;
     }
 
-    document
-        .getElementById("nextBtn")
-        .disabled = false;
+    updateSidebar();
+}
+
+function checkImageFillAnswer(){
+
+    let q = quiz[current];
+
+    let selected = [];
+
+    q.labels.forEach((label,index)=>{
+
+        selected.push(
+            document
+                .getElementById(
+                    "fill_" + index
+                )
+                .value
+        );
+    });
+
+    userAnswers[current] = selected;
+
+    let correct =
+        q.correctAnswers;
+
+    let isCorrect =
+        JSON.stringify(selected)
+        ===
+        JSON.stringify(correct);
+
+    let feedback =
+        document.getElementById("feedback");
+
+    if(isCorrect){
+
+        feedback.className =
+            "correct";
+
+        feedback.innerHTML =
+            "✅ Σωστό!";
+
+    }else{
+
+        feedback.className =
+            "wrong";
+
+        feedback.innerHTML =
+        `
+        ❌ Λάθος!
+
+        <br><br>
+
+        α → ${correct[0]}
+        <br>
+
+        β → ${correct[1]}
+        <br>
+
+        γ → ${correct[2]}
+        `;
+    }
 
     updateSidebar();
 }
@@ -611,6 +752,22 @@ function showResults(){
     let score = 0;
 
     quiz.forEach((q, i) => {
+        
+        if(q.type === "image_fill"){
+
+            let user =
+                userAnswers[i] || [];
+    
+            if(
+                JSON.stringify(user)
+                ===
+                JSON.stringify(q.correctAnswers)
+            ){
+                score++;
+            }
+        
+            return;
+        }
 
         let correct =
             Array.isArray(q.correct)
@@ -717,7 +874,29 @@ function updateSidebar(){
 
     sidebar.innerHTML = "";
 
+    let currentSection = "";
+
     quiz.forEach((q, index) => {
+
+        /* ===== ΤΙΤΛΟΣ ΕΝΟΤΗΤΑΣ ===== */
+
+        if(q.section !== currentSection){
+
+            currentSection = q.section;
+
+            let header =
+                document.createElement("h4");
+
+            header.innerText = currentSection;
+
+            header.style.marginTop = "15px";
+            header.style.marginBottom = "5px";
+            header.style.color = "#007bff";
+
+            sidebar.appendChild(header);
+        }
+
+        /* ===== ΕΡΩΤΗΣΗ ===== */
 
         let div =
             document.createElement("div");
@@ -771,6 +950,13 @@ function updateSidebar(){
             current = index;
 
             loadQuestion();
+
+            document
+                .getElementById("question")
+                .scrollIntoView({
+                    behavior:"smooth",
+                    block:"start"
+                });
         };
 
         sidebar.appendChild(div);
