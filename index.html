@@ -963,6 +963,12 @@ function updateSidebar(){
                 "image_fill"
             ){
 
+                console.log(
+                "Q", index+1,
+                "USER=", user,
+                "CORRECT=", q.correctAnswers
+                );
+
                 ok =
                     JSON.stringify(user || [])
                     ===
