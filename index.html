@@ -39,20 +39,6 @@ body{
     background:#f0f0f0;
 }
 
-.section-header{
-    background:#007bff;
-    color:white;
-    padding:10px;
-    border-radius:8px;
-    cursor:pointer;
-    margin-top:10px;
-    font-weight:bold;
-}
-
-.section-header:hover{
-    background:#005ecb;
-}
-
 .sidebar-item:hover{
     background:#e0e0e0;
 }
@@ -386,7 +372,6 @@ select{
 let quiz = [];
 let current = 0;
 let userAnswers = [];
-let expandedSections = {};
 
 /* ================= LOAD JSON ================= */
 
@@ -897,38 +882,22 @@ function updateSidebar(){
 
         if(q.section !== currentSection){
 
-    currentSection = q.section;
+            currentSection = q.section;
 
-    let header =
-        document.createElement("div");
+            let header =
+                document.createElement("h4");
 
-    header.className = "section-header";
+            header.innerText = currentSection;
 
-    if(expandedSections[currentSection] === undefined){
-        expandedSections[currentSection] = false;
-    }
+            header.style.marginTop = "15px";
+            header.style.marginBottom = "5px";
+            header.style.color = "#007bff";
 
-    header.innerHTML =
-        (expandedSections[currentSection]
-            ? "▼ "
-            : "► ")
-        + currentSection;
-
-    header.onclick = () => {
-
-        expandedSections[currentSection] =
-            !expandedSections[currentSection];
-
-        updateSidebar();
-    };
-
-    sidebar.appendChild(header);
-}
+            sidebar.appendChild(header);
+        }
 
         /* ===== ΕΡΩΤΗΣΗ ===== */
-        if(!expandedSections[currentSection]){
-    return;
-}
+
         let div =
             document.createElement("div");
 
