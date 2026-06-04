@@ -755,19 +755,16 @@ function showResults(){
         
         if(q.type === "image_fill"){
 
-            console.log("SIDEBAR USER:", user);
-            console.log("SIDEBAR CORRECT:", q.correctAnswers);
-            console.log(
-                "SIDEBAR EQUAL:",
-                JSON.stringify(user || []) === JSON.stringify(q.correctAnswers)
-            );
-        
-            ok =
-               JSON.stringify(user || [])
-               ===
-               JSON.stringify(q.correctAnswers);
-        
-        }else{
+            let user =
+                userAnswers[i] || [];
+    
+            if(
+                JSON.stringify(user)
+                ===
+                JSON.stringify(q.correctAnswers)
+            ){
+                score++;
+            }
         
             return;
         }
