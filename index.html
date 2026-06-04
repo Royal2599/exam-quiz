@@ -43,6 +43,20 @@ body{
     background:#e0e0e0;
 }
 
+.section-header{
+    background:#007bff;
+    color:white;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:10px;
+    font-weight:bold;
+}
+
+.section-header:hover{
+    background:#005ecb;
+}
+
 .correctItem{
     background:#d4edda;
 }
@@ -372,6 +386,7 @@ select{
 let quiz = [];
 let current = 0;
 let userAnswers = [];
+let expandedSections = {};
 
 /* ================= LOAD JSON ================= */
 
@@ -874,93 +889,153 @@ function updateSidebar(){
 
     sidebar.innerHTML = "";
 
-    let currentSection = "";
+    let sections = {};
 
-    quiz.forEach((q, index) => {
+    quiz.forEach((q,index)=>{
 
-        /* ===== ΤΙΤΛΟΣ ΕΝΟΤΗΤΑΣ ===== */
+        let section =
+            q.section || "Χωρίς Ενότητα";
 
-        if(q.section !== currentSection){
+        if(!sections[section]){
 
-            currentSection = q.section;
-
-            let header =
-                document.createElement("h4");
-
-            header.innerText = currentSection;
-
-            header.style.marginTop = "15px";
-            header.style.marginBottom = "5px";
-            header.style.color = "#007bff";
-
-            sidebar.appendChild(header);
+            sections[section] = [];
         }
 
-        /* ===== ΕΡΩΤΗΣΗ ===== */
+        sections[section].push({
+            q,
+            index
+        });
 
-        let div =
+    });
+
+    Object.keys(sections).forEach(sectionName=>{
+
+        let header =
             document.createElement("div");
 
-        div.className = "sidebar-item";
+        header.className =
+            "section-header";
 
-        let correct =
-            Array.isArray(q.correct)
-            ? q.correct
-            : [q.correct];
+        header.innerHTML =
+            (expandedSections[sectionName]
+             ? "▼ "
+             : "► ")
+            + sectionName;
 
-        let user =
-            userAnswers[index];
+        header.onclick = ()=>{
 
-        if(user !== undefined){
+            expandedSections[sectionName] =
+                !expandedSections[sectionName];
 
-            let ok =
-                JSON.stringify([...user].sort())
+            updateSidebar();
+        };
+
+        sidebar.appendChild(header);
+
+        if(!expandedSections[sectionName])
+            return;
+
+        sections[sectionName]
+        .forEach(item=>{
+
+            let q =
+                item.q;
+
+            let index =
+                item.index;
+
+            let div =
+                document.createElement("div");
+
+            div.className =
+                "sidebar-item";
+
+            let user =
+                userAnswers[index];
+
+            let ok = false;
+
+            if(
+                (q.type || "")
+                .trim()
+                .toLowerCase()
                 ===
-                JSON.stringify([...correct].sort());
+                "image_fill"
+            ){
 
-            if(ok){
-
-                div.classList.add("correctItem");
-
-                div.innerHTML =
-                    `✔ Ερώτηση ${index + 1}`;
+                ok =
+                    JSON.stringify(user || [])
+                    ===
+                    JSON.stringify(
+                        q.correctAnswers
+                    );
 
             }else{
 
-                div.classList.add("wrongItem");
+                let correct =
+                    Array.isArray(q.correct)
+                    ? q.correct
+                    : [q.correct];
 
-                div.innerHTML =
-                    `✖ Ερώτηση ${index + 1}`;
+                ok =
+                    JSON.stringify(
+                        [...(user || [])]
+                        .sort()
+                    )
+                    ===
+                    JSON.stringify(
+                        [...correct]
+                        .sort()
+                    );
             }
 
-        }else{
+            if(user !== undefined){
 
-            div.innerHTML =
-                `Ερώτηση ${index + 1}`;
-        }
+                if(ok){
 
-        if(q.hint){
+                    div.classList.add(
+                        "correctItem"
+                    );
 
-            div.innerHTML +=
-                `<br><small>💡 Υπόδειξη διαθέσιμη</small>`;
-        }
+                    div.innerHTML =
+                        `✔ Ερώτηση ${index+1}`;
 
-        div.onclick = () => {
+                }else{
 
-            current = index;
+                    div.classList.add(
+                        "wrongItem"
+                    );
 
-            loadQuestion();
+                    div.innerHTML =
+                        `✖ Ερώτηση ${index+1}`;
+                }
 
-            document
-                .getElementById("question")
-                .scrollIntoView({
-                    behavior:"smooth",
-                    block:"start"
-                });
-        };
+            }else{
 
-        sidebar.appendChild(div);
+                div.innerHTML =
+                    `Ερώτηση ${index+1}`;
+            }
+
+            div.onclick = ()=>{
+
+                current = index;
+
+                loadQuestion();
+
+                document
+                    .getElementById("question")
+                    .scrollIntoView({
+                        behavior:"smooth",
+                        block:"start"
+                    });
+            };
+
+            sidebar.appendChild(div);
+
+        });
+
     });
+
 }
 
 </script>
